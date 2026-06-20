@@ -25,7 +25,7 @@ public class DefaultComponentIntegration implements ComponentIntegration {
     // Default component on the main thread
     @Override
     public Component getDefaultNametag(UUID uuid) {
-        return getPlayer(uuid).name().color(TextColor.color(NamedTextColor.WHITE.asHSV()));
+        return getPlayer(uuid).name().color(TextColor.color(NamedTextColor.YELLOW.asHSV()));
     }
 
     @Override

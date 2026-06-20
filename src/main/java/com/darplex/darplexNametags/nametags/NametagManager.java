@@ -109,6 +109,6 @@ public class NametagManager {
     }
 
     public void shutdown() {
-        nametagMap.values().forEach((nametag) -> nametag.shutdown());
+        nametagMap.values().forEach(Nametag::shutdown);
     }
 }
