@@ -1,0 +1,8 @@
+name: DarplexNametags
+version: '${version}'
+
+main: com.darplex.darplexNametags.DarplexNametags
+api-version: '1.21.1'
+load: POSTWORLD
+depend:
+  - PacketEvents
