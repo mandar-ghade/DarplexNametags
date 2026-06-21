@@ -1,6 +1,9 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+
 plugins {
     id("java-library")
     id("xyz.jpenilla.run-paper") version "3.0.2"
+    id("com.gradleup.shadow") version "9.4.2"
 }
 
 repositories {
@@ -27,6 +30,13 @@ dependencies {
 
 java {
     toolchain.languageVersion = JavaLanguageVersion.of(21)
+}
+
+tasks.named<ShadowJar>("shadowJar") {
+    relocate("me.tofaa.entitylib", "com.darplex.darplexNametags.libraries.entitylib")
+}
+tasks.build {
+    dependsOn(tasks.shadowJar)
 }
 
 tasks {

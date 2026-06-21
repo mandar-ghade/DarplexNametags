@@ -88,7 +88,7 @@ public class NametagManager {
         receiver.refresh();
         boolean anyFailure = Bukkit.getOnlinePlayers()
                 .stream()
-                .filter(p -> p.getUniqueId() != uuid)
+//                .filter(p -> p.getUniqueId() != uuid)
                 .map((sender) -> this.nametagMap.get(sender.getUniqueId()))
                 .map(receiver::refreshSelfView)
                 .anyMatch((success) -> !success);

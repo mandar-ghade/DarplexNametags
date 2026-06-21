@@ -3,6 +3,7 @@ package com.darplex.darplexNametags.listeners;
 import com.darplex.darplexNametags.DarplexNametags;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -25,9 +26,21 @@ public class JoinListener implements Listener {
         getPlugin().getNametagManager().delete(uuid);
     }
 
+    private void refreshSelfView(UUID uuid) {
+        // what you see
+        getPlugin().getNametagManager().refreshNametagAndUpdateView(uuid);
+    }
+
     @EventHandler(priority = EventPriority.HIGH)
     public void onJoin(PlayerJoinEvent event) {
-        createNametagIfNotExists(event.getPlayer().getUniqueId());
+        UUID uuid = event.getPlayer().getUniqueId();
+        createNametagIfNotExists(uuid);
+        // refresh after 10 seconds! (fully joined in)
+        Bukkit.getScheduler().runTaskLater(getPlugin(),
+                () -> refreshSelfView(uuid),
+                10L
+        );
+//        refreshSelfView(uuid);
     }
 
     @EventHandler(priority = EventPriority.HIGH)

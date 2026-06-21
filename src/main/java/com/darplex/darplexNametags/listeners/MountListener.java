@@ -9,9 +9,11 @@ import com.github.retrooper.packetevents.protocol.packettype.PacketType;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSetPassengers;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.bukkit.Bukkit;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
+import java.util.logging.Level;
 
 @RequiredArgsConstructor
 public class MountListener implements PacketListener {
@@ -47,6 +49,7 @@ public class MountListener implements PacketListener {
     @Override
     public void onPacketSend(PacketSendEvent event) {
         if (event.getPacketType() == PacketType.Play.Server.SET_PASSENGERS) {
+            Bukkit.getLogger().log(Level.SEVERE, "PassengerManager >> Called called called!");
             WrapperPlayServerSetPassengers packet = new WrapperPlayServerSetPassengers(event);
             UUID uuid = event.getUser().getUUID();
             // replaces vanilla passengers from before with the new ones.

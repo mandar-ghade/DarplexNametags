@@ -83,7 +83,7 @@ public class Nametag {
                 true,
                 tabbedPlayer.getPing(),
                 SpigotConversionUtil.fromBukkitGameMode(tabbedPlayer.getGameMode()),
-                textOpt.orElseThrow(),
+                textOpt.orElseThrow().append(Component.text("(e)")),
                 null,
                 0
         );
@@ -123,7 +123,7 @@ public class Nametag {
     }
 
     public void makeTagInvisibleFor(UUID viewer) {
-        var location = view.getLocation(viewer);
+        var location = view.getOwnerHeadLoc();
         logIfAbsent(location, "Could not make tag invisible for viewer!");
         // Makes your own tag invisible for viewer
         view.update(viewer, new View.NewView(
@@ -135,7 +135,7 @@ public class Nametag {
     }
 
     public void makeTagVisibleFor(UUID viewer) {
-        var location = view.getLocation(viewer);
+        var location = view.getOwnerHeadLoc();
         logIfAbsent(location, "Could not make tag visible for viewer!");
         // Makes your own tag Visible for viewer
         view.update(viewer, new View.NewView(
@@ -153,6 +153,7 @@ public class Nametag {
             return;
         }
         Bukkit.getServer().getLogger().warning("Tag creation in `Nametag.java` has ran!");
+        // todo: THIS makes a view for everyone!! O(n)
         for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
             UUID viewerUUID = onlinePlayer.getUniqueId();
             view.create(viewerUUID);
@@ -195,6 +196,11 @@ public class Nametag {
     public boolean refreshSelfView(Nametag senderNametag) {
         // #1 refresh self display component (do `refresh` on sender)
 
+        if (senderNametag == null) {
+            plugin.getLogger().log(Level.SEVERE, "View >> senderNametag is null!");
+            return false;
+        }
+
         Player viewer = Bukkit.getPlayer(uuid);
         User viewerUser = viewer == null ? null : view.resolveUser(uuid).orElse(null);
 
@@ -207,12 +213,22 @@ public class Nametag {
             return false;
         }
 
+        plugin.getLogger().log(Level.INFO, "View >> " + viewer.getName() + " running refreshSelfView(" + senderPlayer.getName() + ")");
+
+        // Create `View` of `sender` if not exists! (yay)
+        if (!senderNametag.getView().hasViewer(uuid)) {
+            senderNametag.getView().create(uuid);
+        }
+
+
         // both methods dynamically updates text too!
         // Refreshes display & sends back to you!
 
         if (canSee(senderNametag.uuid)) {
+            plugin.getLogger().log(Level.INFO, "View >> " + viewer.getName() + " has *visible tag for owner: " + senderPlayer.getName());
             senderNametag.makeTagVisibleFor(uuid);
         } else {
+            plugin.getLogger().log(Level.INFO, "View >> " + viewer.getName() + " has invisible tag for owner: " + senderPlayer.getName());
             senderNametag.makeTagInvisibleFor(uuid);
         }
 

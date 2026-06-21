@@ -62,7 +62,7 @@ public class View {
                 .map(this::playerToUser);
     }
 
-    private Optional<Location> getOwnerHeadLoc() {
+    public Optional<Location> getOwnerHeadLoc() {
         return Optional.ofNullable(Bukkit.getPlayer(owner))
                 .map(Player::getLocation)
                 // todo: work on the locs..
