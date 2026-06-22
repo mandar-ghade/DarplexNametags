@@ -1,6 +1,7 @@
 package com.darplex.darplexNametags;
 
 import com.darplex.darplexNametags.commands.VanishCmd;
+import com.darplex.darplexNametags.counters.CounterManager;
 import com.darplex.darplexNametags.integrations.ComponentIntegration;
 import com.darplex.darplexNametags.integrations.DefaultComponentIntegration;
 import com.darplex.darplexNametags.integrations.DefaultVanishIntegration;
@@ -34,6 +35,7 @@ public final class DarplexNametags extends JavaPlugin {
     @NotNull @Getter VirtualPassengerManager virtualPassengerManager;
     @NotNull @Getter @Setter VanishIntegration vanishIntegration;
     @NotNull @Getter NametagManager nametagManager;
+    @NotNull @Getter CounterManager counterManager;
 
     private void registerMountListener() {
         getPacketEventsAPI().getEventManager().registerListener(
@@ -80,11 +82,13 @@ public final class DarplexNametags extends JavaPlugin {
         virtualPassengerManager = new VirtualPassengerManager();
         vanishIntegration = new DefaultVanishIntegration(this);
         nametagManager = new NametagManager(this);
+        counterManager = new CounterManager(this);
     }
 
     @Override
     public void onDisable() {
         getNametagManager().shutdown();
+        getCounterManager().shutdown();
     }
 
 }

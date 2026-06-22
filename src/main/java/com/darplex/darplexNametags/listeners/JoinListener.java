@@ -26,6 +26,7 @@ public class JoinListener implements Listener {
         getPlugin().getNametagManager().delete(uuid);
     }
 
+    // Allows you to see everyone else's nametag!
     private void refreshSelfView(UUID uuid) {
         // what you see
         getPlugin().getNametagManager().refreshNametagAndUpdateView(uuid);
@@ -35,7 +36,7 @@ public class JoinListener implements Listener {
     public void onJoin(PlayerJoinEvent event) {
         UUID uuid = event.getPlayer().getUniqueId();
         createNametagIfNotExists(uuid);
-        // refresh after 10 seconds! (fully joined in)
+        // refresh after 1 seconds! (fully joined in)
         Bukkit.getScheduler().runTaskLater(getPlugin(),
                 () -> refreshSelfView(uuid),
                 10L
