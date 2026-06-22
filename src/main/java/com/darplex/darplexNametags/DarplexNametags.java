@@ -70,7 +70,7 @@ public final class DarplexNametags extends JavaPlugin {
         registerCommands();
         SpigotEntityLibPlatform platform = new SpigotEntityLibPlatform(this);
         APIConfig settings = new APIConfig(packetEventsAPI)
-                .debugMode()
+//                .debugMode()
                 .checkForUpdates()
                 .tickTickables()
                 .useBstats()

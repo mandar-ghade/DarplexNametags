@@ -18,11 +18,8 @@ public class CounterManager {
     @Getter Map<UUID, Set<Class<?>>> userClasses = new ConcurrentHashMap<>();
 
     public <T extends Tickable> void add(UUID user, T tickable) {
-//        getPlugin().getLogger().info("CounterManager: Checking: " + user + " clazz: " + tickable.getClass());
         Map.Entry<UUID, Class<?>> entry = Map.entry(user, tickable.getClass());
         if (tickables.containsKey(entry)) { // prevents duplicates!
-            getPlugin().getLogger().info("CounterManager: Error! Duplicate: " + user + " clazz: " + tickable.getClass());
-            getPlugin().getLogger().info("New len: " + userClasses.get(user).size());
             return;
         }
         userClasses.computeIfAbsent(user, (ignored) -> new HashSet<>())
@@ -53,7 +50,6 @@ public class CounterManager {
         for (var counterClazz : userClasses.get(user)) {
             Tickable counter = tickables.remove(Map.entry(user, counterClazz));
             if (counter != null) {
-//                getPlugin().getLogger().info("CounterManager: Cancelled task for: " + user + " class: " + counterClazz);
                 cancelCounter(counter);
             }
         }

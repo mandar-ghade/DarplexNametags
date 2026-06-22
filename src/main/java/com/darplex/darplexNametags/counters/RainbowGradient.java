@@ -27,13 +27,7 @@ public class RainbowGradient implements Tickable {
         task = new BukkitRunnable() {
             @Override
             public void run() {
-//                getPlugin().getLogger().info("Ticking! " + tick);
                 tick += 1;
-//                if (needsReset()) {
-//                    tick = 1;
-//                } else {
-//                    tick += 1;
-//                }
             }
         }.runTaskTimer(getPlugin(), 0L, 5L);
         // runs every second!
@@ -42,7 +36,6 @@ public class RainbowGradient implements Tickable {
 
     @Override
     public void stop() {
-        getPlugin().getLogger().log(Level.INFO, "RainbowGradient>> Rainbow gradient stopped!");
         if (task != null) task.cancel();
     }
 

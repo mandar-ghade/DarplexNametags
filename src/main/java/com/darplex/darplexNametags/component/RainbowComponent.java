@@ -43,7 +43,6 @@ public class RainbowComponent extends DarplexComponent {
     }
 
     private String getTextWithTags() {
-        log(getRainbowReplacementStr(getGradient()) + text);
         return getRainbowReplacementStr(getGradient()) + text;
     }
 }

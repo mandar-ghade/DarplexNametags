@@ -31,7 +31,6 @@ public class JoinListener implements Listener {
 
     // Allows you to see everyone else's nametag!
     private void refreshSelfView(UUID uuid) {
-//        log("Rainbow Refresh Ticker is ticking!");
         // what you see
         getPlugin().getNametagManager().refreshNametagAndUpdateView(uuid);
     }
@@ -68,22 +67,12 @@ public class JoinListener implements Listener {
         appendTagRefresh(uuid);
     }
 
-
-    private String hasRefreshEntries(UUID uuid) {
-        return Boolean.toString(getPlugin().getCounterManager().getUserClasses().containsKey(uuid));
-    }
-
-    private int getSize(UUID uuid) {
-       return getPlugin().getCounterManager().getUserClasses().get(uuid).size();
-    }
-
     @EventHandler(priority = EventPriority.HIGH)
     public void onLeave(PlayerQuitEvent event) {
         UUID uuid = event.getPlayer().getUniqueId();
         removeTagRefresh(uuid);
         cancelAllCounters(uuid);
         removeNametag(event.getPlayer().getUniqueId());
-        log("Has entries: " + hasRefreshEntries(uuid));
     }
 
 }

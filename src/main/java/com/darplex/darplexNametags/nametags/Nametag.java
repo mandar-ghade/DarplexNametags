@@ -213,8 +213,6 @@ public class Nametag {
             return false;
         }
 
-        plugin.getLogger().log(Level.INFO, "View >> " + viewer.getName() + " running refreshSelfView(" + senderPlayer.getName() + ")");
-
         // Create `View` of `sender` if not exists! (yay)
         if (!senderNametag.getView().hasViewer(uuid)) {
             senderNametag.getView().create(uuid);
@@ -225,10 +223,10 @@ public class Nametag {
         // Refreshes display & sends back to you!
 
         if (canSee(senderNametag.uuid)) {
-            plugin.getLogger().log(Level.INFO, "View >> " + viewer.getName() + " has *visible tag for owner: " + senderPlayer.getName());
+//            plugin.getLogger().log(Level.INFO, "View >> " + viewer.getName() + " has *visible tag for owner: " + senderPlayer.getName());
             senderNametag.makeTagVisibleFor(uuid);
         } else {
-            plugin.getLogger().log(Level.INFO, "View >> " + viewer.getName() + " has invisible tag for owner: " + senderPlayer.getName());
+//            plugin.getLogger().log(Level.INFO, "View >> " + viewer.getName() + " has invisible tag for owner: " + senderPlayer.getName());
             senderNametag.makeTagInvisibleFor(uuid);
         }
 

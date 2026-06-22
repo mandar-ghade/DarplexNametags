@@ -35,7 +35,6 @@ public abstract class RefreshTicker implements Tickable {
 
     @Override
     public void stop() {
-        getPlugin().getLogger().log(Level.INFO, "RainbowRefreahTicker >> Refresh ticker stopped!");
         if (task != null) task.cancel();
     }
 
