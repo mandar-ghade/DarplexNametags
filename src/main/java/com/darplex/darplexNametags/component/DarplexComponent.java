@@ -3,12 +3,9 @@ package com.darplex.darplexNametags.component;
 import com.darplex.darplexNametags.DarplexNametags;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
-import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
-import org.bukkit.Bukkit;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -25,6 +22,15 @@ public class DarplexComponent {
     // todo: this is a little strange
     TextAsComponent componentResolver = () -> mm.deserialize(text) ;
 
+    // TODO: Work on better serialization!
+    public static DarplexComponent from(@NotNull MiniMessage mm, Component component) {
+        return DarplexComponent.text(mm.serialize(component));
+    }
+
+    public static DarplexComponent text(String text) {
+        return new DarplexComponent(text);
+    }
+
     public interface TextAsComponent {
         Component get();
     }
@@ -33,7 +39,7 @@ public class DarplexComponent {
         return new RainbowComponent(plugin, text, ownerUUID);
     }
 
-    public DarplexComponent colored(NamedTextColor color) {
+    public DarplexComponent color(NamedTextColor color) {
         return new ColoredComponent(text, color);
     }
 
@@ -42,7 +48,7 @@ public class DarplexComponent {
         return this;
     }
 
-    public DarplexComponent space() {
+    public static DarplexComponent space() {
         return new DarplexComponent(" ");
     }
 

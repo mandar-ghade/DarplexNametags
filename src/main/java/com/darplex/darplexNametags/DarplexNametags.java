@@ -78,7 +78,7 @@ public final class DarplexNametags extends JavaPlugin {
                 .usePlatformLogger();
         EntityLib.init(platform, settings);
         entityLibAPI = EntityLib.getApi();
-        componentIntegration = new DefaultComponentIntegration();
+        componentIntegration = new DefaultComponentIntegration(this);
         virtualPassengerManager = new VirtualPassengerManager();
         vanishIntegration = new DefaultVanishIntegration(this);
         nametagManager = new NametagManager(this);
