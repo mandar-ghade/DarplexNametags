@@ -66,7 +66,7 @@ public class View {
         return Optional.ofNullable(Bukkit.getPlayer(owner))
                 .map(Player::getLocation)
                 // todo: work on the locs..
-                .map((loc) -> loc.add(0, 0, 0))
+                .map((loc) -> loc.add(0, 1.65, 0))
                 .map(SpigotConversionUtil::fromBukkitLocation);
     }
 
@@ -211,9 +211,7 @@ public class View {
     }
 
     // Whoever is viewing the owner
-    public Optional<WrapperEntity> entityOf(UUID viewer) {
-        return Optional.of(entity.getEntities().get(viewer));
-    }
+    public Optional<WrapperEntity> entityOf(UUID viewer) { return Optional.ofNullable(entity.getEntities().get(viewer)); }
 
     @RequiredArgsConstructor
     public static class NewView {

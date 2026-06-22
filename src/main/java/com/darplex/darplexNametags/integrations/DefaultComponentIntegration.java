@@ -41,7 +41,8 @@ public class DefaultComponentIntegration implements ComponentIntegration {
     public DarplexComponent getDefaultNametagDP(UUID uuid) {
         return DarplexComponent
                 .from(mm, getDefaultNametag(uuid))
-                .rainbow(getPlugin(), uuid);
+//                .rainbow(getPlugin(), uuid)
+                .color(NamedTextColor.YELLOW);
     }
 
     @Override

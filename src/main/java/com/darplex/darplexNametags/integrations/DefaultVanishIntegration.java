@@ -35,7 +35,7 @@ public class DefaultVanishIntegration implements VanishIntegration {
     public void vanishPlayer(Player player) {
         Bukkit.getOnlinePlayers().stream()
                 .filter((viewer) -> player.getUniqueId() != viewer.getUniqueId()
-                        && !canSee(player.getUniqueId(), viewer.getUniqueId())
+                        && !canSee(viewer.getUniqueId(), player.getUniqueId())
                 ).forEach((viewer) -> viewer.hidePlayer(getPlugin(), player));
     }
 
@@ -43,7 +43,7 @@ public class DefaultVanishIntegration implements VanishIntegration {
     public void unvanishPlayer(Player player) {
         Bukkit.getOnlinePlayers().stream()
                 .filter((viewer) -> player.getUniqueId() != viewer.getUniqueId()
-                        && canSee(player.getUniqueId(), viewer.getUniqueId())
+                        && canSee(viewer.getUniqueId(), player.getUniqueId())
                 ).forEach((viewer) -> viewer.showPlayer(getPlugin(), player));
     }
 

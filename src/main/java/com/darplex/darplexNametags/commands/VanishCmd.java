@@ -39,11 +39,12 @@ public class VanishCmd {
     }
 
     private void setOwnerInvisible(UUID owner, UUID viewer) {
-        getPlugin().getVanishIntegration().setCanSee(owner, viewer, false);
+        // Viewer cannot see you!
+        getPlugin().getVanishIntegration().setCanSee(viewer, owner, false);
     }
 
     private void setOwnerVisible(UUID owner, UUID viewer) {
-        getPlugin().getVanishIntegration().setCanSee(owner, viewer, true);
+        getPlugin().getVanishIntegration().setCanSee(viewer, owner, true);
     }
 
     public boolean isVanished(UUID owner) {

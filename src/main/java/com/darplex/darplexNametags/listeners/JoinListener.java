@@ -1,11 +1,9 @@
 package com.darplex.darplexNametags.listeners;
 
 import com.darplex.darplexNametags.DarplexNametags;
-import com.darplex.darplexNametags.counters.RefreshTicker;
-import com.darplex.darplexNametags.counters.refreshTickers.RainbowRefreshTicker;
+import com.darplex.darplexNametags.counters.refreshTickers.NametagRefreshTicker;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -36,8 +34,8 @@ public class JoinListener implements Listener {
     }
 
     // Delays after 0.5 second, runs every second!
-    private RainbowRefreshTicker getRefreshTicker(UUID uuid) {
-        return new RainbowRefreshTicker(plugin, () -> refreshSelfView(uuid), 10L, 5L);
+    private NametagRefreshTicker getRefreshTicker(UUID uuid) {
+        return new NametagRefreshTicker(plugin, () -> refreshSelfView(uuid), 10L, 20L);
     }
 
     private void appendTagRefresh(UUID uuid) {
@@ -51,7 +49,7 @@ public class JoinListener implements Listener {
 
     private void removeTagRefresh(UUID uuid) {
         getPlugin().getCounterManager()
-                .cancel(uuid, RainbowRefreshTicker.class);
+                .cancel(uuid, NametagRefreshTicker.class);
     }
 
     // todo: use when possible! (for everything else basically)

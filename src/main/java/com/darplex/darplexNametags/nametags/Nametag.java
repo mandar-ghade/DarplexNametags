@@ -83,7 +83,7 @@ public class Nametag {
                 true,
                 tabbedPlayer.getPing(),
                 SpigotConversionUtil.fromBukkitGameMode(tabbedPlayer.getGameMode()),
-                textOpt.orElseThrow().append(Component.text("(e)")),
+                textOpt.orElseThrow(),
                 null,
                 0
         );
@@ -152,15 +152,24 @@ public class Nametag {
         if (player == null || !player.isOnline() || user == null) {
             return;
         }
-        Bukkit.getServer().getLogger().warning("Tag creation in `Nametag.java` has ran!");
-        // todo: THIS makes a view for everyone!! O(n)
+//        Bukkit.getServer().getLogger().warning("Tag creation in `Nametag.java` has ran!");
+        // THIS makes a view for everyone who can see you! O(n)
+        List<Player> viewers = new ArrayList<>();
         for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
             UUID viewerUUID = onlinePlayer.getUniqueId();
             view.create(viewerUUID);
-            if (!canSeeMe(viewerUUID)) makeTagInvisibleFor(viewerUUID);
+            if (!canSeeMe(viewerUUID)) {
+                makeTagInvisibleFor(viewerUUID);
+            } else { // only those who can SEE ME gets my tab packet!
+                viewers.add(onlinePlayer);
+            }
+        }
+        // invisible vanilla tag!
+        if (!noNametagTeam.hasEntry(uuid.toString())) {
+            noNametagTeam.addEntry(uuid.toString());
         }
         // todo: toggle in tab list.
-        toggleInTabList(player, user);
+        toggleInTabListForViewers(viewers.stream(), user, player);
     }
 
     // Logout or server shutdown
@@ -196,6 +205,12 @@ public class Nametag {
     public boolean refreshSelfView(Nametag senderNametag) {
         // #1 refresh self display component (do `refresh` on sender)
 
+        // STOP you from seeing vanished players (!canSee(vanish))
+            // SENDER.deleteView(YOU)
+        // Allow you to see unvanished players!
+            // SENDER.addViewer(YOU)
+
+
         if (senderNametag == null) {
             plugin.getLogger().log(Level.SEVERE, "View >> senderNametag is null!");
             return false;
@@ -213,26 +228,23 @@ public class Nametag {
             return false;
         }
 
-        // Create `View` of `sender` if not exists! (yay)
-        if (!senderNametag.getView().hasViewer(uuid)) {
-            senderNametag.getView().create(uuid);
-        }
-
-
         // both methods dynamically updates text too!
         // Refreshes display & sends back to you!
 
         if (canSee(senderNametag.uuid)) {
 //            plugin.getLogger().log(Level.INFO, "View >> " + viewer.getName() + " has *visible tag for owner: " + senderPlayer.getName());
             senderNametag.makeTagVisibleFor(uuid);
+
+            Set<Player> you = Set.of(viewer);
+            // Sends tab list of other player back to you!
+            senderNametag.toggleInTabListForViewers(you.stream(), senderUser, senderPlayer);
+
         } else {
-//            plugin.getLogger().log(Level.INFO, "View >> " + viewer.getName() + " has invisible tag for owner: " + senderPlayer.getName());
+            // Can see them but I'm not allowed to now!
+            // (Make invisible)
             senderNametag.makeTagInvisibleFor(uuid);
         }
 
-        Set<Player> you = Set.of(viewer);
-        // Sends tab list of other player back to you!
-        senderNametag.toggleInTabListForViewers(you.stream(), senderUser, senderPlayer);
         return true;
     }
 
