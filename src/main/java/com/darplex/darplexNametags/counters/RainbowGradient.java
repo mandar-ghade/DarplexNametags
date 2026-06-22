@@ -14,13 +14,11 @@ public class RainbowGradient implements Tickable {
 
     @NotNull @Getter DarplexNametags plugin;
 
-    private UUID uuid = UUID.randomUUID();
     private int tick = 1;
-    private BukkitRunnable task;
+    private BukkitTask task;
 
-    @Override
-    public UUID getUUID() {
-        return uuid;
+    private boolean needsReset() {
+        return (tick % 10) == 0L;
     }
 
     @Override
@@ -28,14 +26,14 @@ public class RainbowGradient implements Tickable {
         task = new BukkitRunnable() {
             @Override
             public void run() {
-                tick += 1;
-                if ((tick % 10) == 0L) {
+                if (needsReset()) {
                     tick = 1;
+                } else {
+                    tick += 1;
                 }
             }
-        };
-        // every second!
-        task.runTaskTimer(getPlugin(), 0L, 20L);
+        }.runTaskTimer(getPlugin(), 0L, 20L);
+        // runs every second!
     }
 
     @Override

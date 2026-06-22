@@ -14,7 +14,6 @@ public class CounterManager {
     // 1) (userUUID, RainbowTicker.class) -> RainbowTicker instance!
     // 2) (userUUID) -> (RainbowTicker.class, ...)
     @NotNull @Getter DarplexNametags plugin;
-    // this is retarded
     @Getter Map<Map.Entry<UUID, Class<?>>, Tickable> tickables = new ConcurrentHashMap<>();
     @Getter Map<UUID, Set<Class<?>>> userClasses = new ConcurrentHashMap<>();
 

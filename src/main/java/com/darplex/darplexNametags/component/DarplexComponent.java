@@ -19,7 +19,7 @@ public class DarplexComponent {
 //    @NotNull @Getter DarplexNametags plugin;
     // Text contains <tags>!
     @NotNull @Getter String text;
-    @Getter List<DarplexComponent> componentList;
+    @Getter List<DarplexComponent> componentList = List.of();
     @Getter MiniMessage mm = MiniMessage.miniMessage();
     // DarplexComponent.text("test", plugin).append(Cmp.rainbow("hi"))
     // todo: this is a little strange
