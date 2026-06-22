@@ -62,7 +62,6 @@ public final class DarplexNametags extends JavaPlugin {
         getLifecycleManager().registerEventHandler(LifecycleEvents.COMMANDS, this::registerCmds);
     }
 
-
     @Override
     public void onEnable() {
         // TODO: check that both packetevents and entitylib are installed and are "softdepends"

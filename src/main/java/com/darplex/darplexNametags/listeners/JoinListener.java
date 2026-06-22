@@ -1,6 +1,8 @@
 package com.darplex.darplexNametags.listeners;
 
 import com.darplex.darplexNametags.DarplexNametags;
+import com.darplex.darplexNametags.counters.RefreshTicker;
+import com.darplex.darplexNametags.counters.refreshTickers.RainbowRefreshTicker;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.Bukkit;
@@ -12,6 +14,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
+import java.util.logging.Level;
 
 @RequiredArgsConstructor
 public class JoinListener implements Listener {
@@ -28,23 +31,59 @@ public class JoinListener implements Listener {
 
     // Allows you to see everyone else's nametag!
     private void refreshSelfView(UUID uuid) {
+//        log("Rainbow Refresh Ticker is ticking!");
         // what you see
         getPlugin().getNametagManager().refreshNametagAndUpdateView(uuid);
+    }
+
+    // Delays after 0.5 second, runs every second!
+    private RainbowRefreshTicker getRefreshTicker(UUID uuid) {
+        return new RainbowRefreshTicker(plugin, () -> refreshSelfView(uuid), 10L, 5L);
+    }
+
+    private void appendTagRefresh(UUID uuid) {
+        getPlugin().getCounterManager()
+                .add(uuid, getRefreshTicker(uuid));
+    }
+
+    private void log(String msg) {
+        getPlugin().getLogger().log(Level.INFO, "JoinListener >> " + msg);
+    }
+
+    private void removeTagRefresh(UUID uuid) {
+        getPlugin().getCounterManager()
+                .cancel(uuid, RainbowRefreshTicker.class);
+    }
+
+    // todo: use when possible! (for everything else basically)
+    private void cancelAllCounters(UUID uuid) {
+        getPlugin().getCounterManager().cancelCounters(uuid);
     }
 
     @EventHandler(priority = EventPriority.HIGH)
     public void onJoin(PlayerJoinEvent event) {
         UUID uuid = event.getPlayer().getUniqueId();
         createNametagIfNotExists(uuid);
-        // refresh after 1 seconds! (fully joined in)
-        Bukkit.getScheduler().runTaskLater(getPlugin(),
-                () -> refreshSelfView(uuid),
-                10L
-        );
-//        refreshSelfView(uuid);
+        // refresh after quarter second! (fully joined in)
+        appendTagRefresh(uuid);
+    }
+
+
+    private String hasRefreshEntries(UUID uuid) {
+        return Boolean.toString(getPlugin().getCounterManager().getUserClasses().containsKey(uuid));
+    }
+
+    private int getSize(UUID uuid) {
+       return getPlugin().getCounterManager().getUserClasses().get(uuid).size();
     }
 
     @EventHandler(priority = EventPriority.HIGH)
-    public void onLeave(PlayerQuitEvent event) { removeNametag(event.getPlayer().getUniqueId()); }
+    public void onLeave(PlayerQuitEvent event) {
+        UUID uuid = event.getPlayer().getUniqueId();
+        removeTagRefresh(uuid);
+        cancelAllCounters(uuid);
+        removeNametag(event.getPlayer().getUniqueId());
+        log("Has entries: " + hasRefreshEntries(uuid));
+    }
 
 }

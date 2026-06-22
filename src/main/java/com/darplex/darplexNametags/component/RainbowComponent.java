@@ -6,6 +6,7 @@ import lombok.Getter;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.UUID;
+import java.util.logging.Level;
 
 // lazily ticking rainbow!
 public class RainbowComponent extends DarplexComponent {
@@ -21,6 +22,7 @@ public class RainbowComponent extends DarplexComponent {
     }
 
     private RainbowGradient tickRainbowIfAbsent() {
+//        log("Ticking new rainbow!");
         RainbowGradient rainbow = new RainbowGradient(getPlugin());
         getPlugin().getCounterManager().add(userUUID, rainbow);
         rainbow.start();
@@ -36,7 +38,12 @@ public class RainbowComponent extends DarplexComponent {
         return "<rainbow:" + r.getTick() + ">";
     }
 
+    private void log(String msg) {
+        getPlugin().getLogger().log(Level.INFO, "RainbowComponent>> " + msg);
+    }
+
     private String getTextWithTags() {
-        return getRainbowReplacementStr(getGradient());
+        log(getRainbowReplacementStr(getGradient()) + text);
+        return getRainbowReplacementStr(getGradient()) + text;
     }
 }

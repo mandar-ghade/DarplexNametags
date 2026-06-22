@@ -43,7 +43,12 @@ public class DarplexComponent {
         return new ColoredComponent(text, color);
     }
 
+    private void addSpace() {
+        componentList.add(DarplexComponent.space());
+    }
+
     public DarplexComponent append(DarplexComponent other) {
+        addSpace();
         componentList.add(other);
         return this;
     }
