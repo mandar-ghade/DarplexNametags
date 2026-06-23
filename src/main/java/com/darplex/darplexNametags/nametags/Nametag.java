@@ -1,6 +1,7 @@
 package com.darplex.darplexNametags.nametags;
 
 import java.util.*;
+import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.stream.Stream;
 
@@ -19,6 +20,7 @@ import me.tofaa.entitylib.meta.display.TextDisplayMeta;
 import me.tofaa.entitylib.wrapper.WrapperEntity;
 import me.tofaa.entitylib.wrapper.WrapperPerPlayerEntity;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.Team;
 
@@ -75,15 +77,13 @@ public class Nametag {
 
     // Gets what "you" are supposed to see!
     private PacketWrapper<WrapperPlayServerPlayerInfoUpdate> getUpdateTabPacket(Player tabbedPlayer, User tabbedUser, UUID viewerUUID) {
-        Optional<Component> textOpt = view.of(viewerUUID);
-        logIfAbsent(textOpt, "Could not getTabPacket for player (text view is absent for viewer!)");
-        // TODO: double check that `tabbedUser` profile doesn't cause an issue with naming!
+        Component text = view.view(viewerUUID);
         WrapperPlayServerPlayerInfoUpdate.PlayerInfo playerInfo = new WrapperPlayServerPlayerInfoUpdate.PlayerInfo(
                 tabbedUser.getProfile(),
                 true,
                 tabbedPlayer.getPing(),
                 SpigotConversionUtil.fromBukkitGameMode(tabbedPlayer.getGameMode()),
-                textOpt.orElseThrow(),
+                text,
                 null,
                 0
         );
@@ -146,6 +146,34 @@ public class Nametag {
         ));
     }
 
+    private Map.Entry<Player, User> getFromUUID(UUID userUUID) {
+        Player player = Bukkit.getPlayer(userUUID);
+        User user = player == null ? null : view.resolveUser(userUUID).get();
+        return Map.entry(player, user);
+    }
+
+    private void sendTabUpdatePacket(UUID viewerUUID) {
+        var tabbed = getFromUUID(uuid);
+        var viewer = getFromUUID(viewerUUID);
+        sendTabUpdatePacket(viewer.getKey(), viewer.getValue(), tabbed.getKey(), tabbed.getValue());
+    }
+
+    public void updateNametagFor(UUID viewer) {
+        // yay!! no refreshing required! (live updates!)
+        User viewerUser = view.resolveUser(viewer).get();
+        view.editText(viewerUser,
+                getPlugin().getComponentIntegration().getCustomNametag(uuid, viewer));
+        viewerUser.sendPacketSilently(view.getPassengersPacket());
+        sendTabUpdatePacket(viewer);
+    }
+
+    public void updateText() {
+        Bukkit.getOnlinePlayers().stream()
+                .map(Player::getUniqueId)
+                .filter(this::canSeeMe)
+                .forEach(this::updateNametagFor);
+    }
+
     private void create() {
         Player player = Bukkit.getPlayer(uuid);
         User user = player == null ? null : view.resolveUser(player.getUniqueId()).orElse(null);
@@ -165,8 +193,8 @@ public class Nametag {
             }
         }
         // invisible vanilla tag!
-        if (!noNametagTeam.hasEntry(uuid.toString())) {
-            noNametagTeam.addEntry(uuid.toString());
+        if (!noNametagTeam.hasEntry(player.getName())) {
+            noNametagTeam.addEntry(player.getName());
         }
         // todo: toggle in tab list.
         toggleInTabListForViewers(viewers.stream(), user, player);
@@ -175,7 +203,8 @@ public class Nametag {
     // Logout or server shutdown
     public void shutdown() {
         view.shutdown();
-        noNametagTeam.removeEntry(uuid.toString());
+        view.resolveUser(uuid)
+                .ifPresent((user) -> noNametagTeam.removeEntry(user.getName()));
     }
 
     // First, run `refresh`, then for every other player on the server,

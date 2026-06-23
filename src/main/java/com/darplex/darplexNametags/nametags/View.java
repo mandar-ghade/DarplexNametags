@@ -66,7 +66,20 @@ public class View {
         return Optional.ofNullable(Bukkit.getPlayer(owner))
                 .map(Player::getLocation)
                 // todo: work on the locs..
-                .map((loc) -> loc.add(0, 1.65, 0))
+                .map((loc) -> loc.add(0, 2.5, 0))
+                .map(SpigotConversionUtil::fromBukkitLocation);
+    }
+
+    public Optional<Location> getLoc() {
+        return Optional.ofNullable(Bukkit.getPlayer(owner))
+                .map(Player::getLocation)
+                // 1.8 is usually ideal!
+                .map((loc) -> loc.add(0, 2.1, 0))
+                .map(loc -> {
+                    loc.setPitch(0);
+                    loc.setYaw(-180);
+                    return loc;
+                })
                 .map(SpigotConversionUtil::fromBukkitLocation);
     }
 
@@ -203,11 +216,8 @@ public class View {
         viewerUser.sendPacketSilently(getPassengersPacket());
     }
 
-    // Whoever is viewing the owner
-    public Optional<Component> of(UUID viewer) {
-        return entityOf(viewer)
-                .map(View::getMeta)
-                .map(TextDisplayMeta::getText);
+    public Component view(UUID viewer) {
+        return getPlugin().getComponentIntegration().getCustomNametag(owner, viewer);
     }
 
     // Whoever is viewing the owner
@@ -247,6 +257,13 @@ public class View {
         entity.getEntities().remove(viewerUser.getUUID());
     }
 
+    public void editText(@NotNull User viewerUser, Component text) {
+        // adds a new line afterwards for aesthetic!
+        modifyDisplay(viewerUser, (displayMeta) -> {
+            displayMeta.setText(text.appendNewline());
+        });
+    }
+
     private void editText(@NotNull User viewerUser, NewView newView) {
         modifyDisplay(viewerUser, (displayMeta) -> {
             displayMeta.setText(newView.getText());
@@ -263,7 +280,10 @@ public class View {
             e.despawn();
             e.spawn(newView.getLoc());
         });
+        // may not be necessary!
         entity.addViewer(viewerUser);
+        // notice...
+        viewerUser.sendPacketSilently(getPassengersPacket());
     }
 
     public void update(UUID viewer, NewView newView) {
@@ -296,11 +316,10 @@ public class View {
         }
         // todo: perhaps just remake
         editText(viewerUser, newView);
+        // todo: notice addPassenger is RIGHT before viewer is added!
         refreshEntityAndSpawn(viewerUser, newView);
-        // todo: make sure that code works without addPassenger (should...)!
 //        addPassengerClean(viewer);
         // resend mount packet!
-        viewerUser.sendPacketSilently(getPassengersPacket());
     }
 
     public void remove(UUID viewer) {

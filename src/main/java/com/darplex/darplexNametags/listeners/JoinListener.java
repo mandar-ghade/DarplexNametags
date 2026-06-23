@@ -2,6 +2,7 @@ package com.darplex.darplexNametags.listeners;
 
 import com.darplex.darplexNametags.DarplexNametags;
 import com.darplex.darplexNametags.counters.refreshTickers.NametagRefreshTicker;
+import com.darplex.darplexNametags.nametags.Nametag;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.bukkit.event.EventHandler;
@@ -33,9 +34,16 @@ public class JoinListener implements Listener {
         getPlugin().getNametagManager().refreshNametagAndUpdateView(uuid);
     }
 
+    private void refreshText(UUID uuid) {
+        getPlugin().getNametagManager().get(uuid)
+                .ifPresent(Nametag::updateText);
+    }
+
     // Delays after 0.5 second, runs every second!
+    // Refreshes what "everyone else" sees!
     private NametagRefreshTicker getRefreshTicker(UUID uuid) {
-        return new NametagRefreshTicker(plugin, () -> refreshSelfView(uuid), 10L, 20L);
+        // 2L is usually nice
+        return new NametagRefreshTicker(plugin, () -> refreshText(uuid), 10L, 10L);
     }
 
     private void appendTagRefresh(UUID uuid) {
@@ -61,7 +69,8 @@ public class JoinListener implements Listener {
     public void onJoin(PlayerJoinEvent event) {
         UUID uuid = event.getPlayer().getUniqueId();
         createNametagIfNotExists(uuid);
-        // refresh after quarter second! (fully joined in)
+        refreshSelfView(uuid);
+        // refresh "how other people see you" every quarter second! (fully joined in)
         appendTagRefresh(uuid);
     }
 

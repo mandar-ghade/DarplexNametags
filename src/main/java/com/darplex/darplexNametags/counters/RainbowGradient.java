@@ -29,7 +29,7 @@ public class RainbowGradient implements Tickable {
             public void run() {
                 tick += 1;
             }
-        }.runTaskTimer(getPlugin(), 0L, 5L);
+        }.runTaskTimer(getPlugin(), 0L, 10L);
         // runs every second!
         // runs every 0.25 seconds!
     }

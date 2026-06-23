@@ -10,8 +10,8 @@ public interface VanishIntegration {
     // TODO: in the future, distinguish seeing "Tab" from seeing their "Nametag"
     // TODO: refactor: Arg 1: viewer, Arg 2: audience
     // Owner == looker, Viewer == target (owner tries to look at viewer)
-    boolean canSee(UUID owner, UUID viewer);
-    void setCanSee(UUID owner, UUID viewer, boolean visible);
+    boolean canSee(UUID owner, UUID target);
+    void setCanSee(UUID owner, UUID target, boolean visible);
     void vanishPlayer(Player player);
     void unvanishPlayer(Player player);
     // can see all vanished users!
