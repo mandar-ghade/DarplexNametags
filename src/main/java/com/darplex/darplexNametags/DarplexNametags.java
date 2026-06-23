@@ -1,5 +1,6 @@
 package com.darplex.darplexNametags;
 
+import com.darplex.darplexNametags.commands.RainbowSpeedCmd;
 import com.darplex.darplexNametags.commands.VanishCmd;
 import com.darplex.darplexNametags.counters.CounterManager;
 import com.darplex.darplexNametags.integrations.ComponentIntegration;
@@ -56,6 +57,7 @@ public final class DarplexNametags extends JavaPlugin {
 
     private void registerCmds(ReloadableRegistrarEvent<Commands> commands) {
         commands.registrar().register(new VanishCmd(this).createCommand());
+        commands.registrar().register(new RainbowSpeedCmd(this).createCommand());
     }
 
     private void registerCommands() {

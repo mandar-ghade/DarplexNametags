@@ -56,6 +56,10 @@ public class View {
         return getPlugin().getPacketEventsAPI().getPlayerManager().getUser(player);
     }
 
+    public Optional<Player> userToPlayer(@NotNull User user) {
+        return Optional.ofNullable(Bukkit.getPlayer(user.getUUID()));
+    }
+
     // Caution: Runs on the main thread
     public Optional<User> resolveUser(UUID viewerUUID) {
         return Optional.ofNullable(Bukkit.getPlayer(viewerUUID))

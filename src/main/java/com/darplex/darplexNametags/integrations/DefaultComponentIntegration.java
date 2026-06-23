@@ -2,6 +2,7 @@ package com.darplex.darplexNametags.integrations;
 
 import com.darplex.darplexNametags.DarplexNametags;
 import com.darplex.darplexNametags.component.DarplexComponent;
+import com.darplex.darplexNametags.counters.RainbowGradient;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.text.Component;
@@ -39,9 +40,9 @@ public class DefaultComponentIntegration implements ComponentIntegration {
 
     // nice and rainbow!
     public DarplexComponent getDefaultNametagDP(UUID uuid) {
-        return DarplexComponent
-                .from(mm, getDefaultNametag(uuid))
-                .rainbow(getPlugin(), uuid);
+        return DarplexComponent.text("Admin").color(NamedTextColor.RED).bold()
+                .append(DarplexComponent.from(mm, getDefaultNametag(uuid))
+                                .rainbow(getPlugin(), uuid));
     }
 
     @Override

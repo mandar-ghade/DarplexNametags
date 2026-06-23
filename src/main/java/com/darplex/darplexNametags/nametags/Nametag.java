@@ -160,7 +160,14 @@ public class Nametag {
 
     public void updateNametagFor(UUID viewer) {
         // yay!! no refreshing required! (live updates!)
-        User viewerUser = view.resolveUser(viewer).get();
+        var owner = view.resolveUser(uuid);
+        var viewerUserOpt = view.resolveUser(viewer);
+        if (owner.isEmpty() || viewerUserOpt.isEmpty()) {
+            Bukkit.getLogger().info("Nametag >> trying to send nametag packet of someone who may be offline!");
+            // if nametag owner doesn't exist, we can't update nametag!
+            return;
+        }
+        User viewerUser = viewerUserOpt.get();
         view.editText(viewerUser,
                 getPlugin().getComponentIntegration().getCustomNametag(uuid, viewer));
         viewerUser.sendPacketSilently(view.getPassengersPacket());

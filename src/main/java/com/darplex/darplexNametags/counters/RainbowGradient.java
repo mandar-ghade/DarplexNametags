@@ -3,6 +3,7 @@ package com.darplex.darplexNametags.counters;
 import com.darplex.darplexNametags.DarplexNametags;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
@@ -13,14 +14,20 @@ import java.util.logging.Level;
 @RequiredArgsConstructor
 public class RainbowGradient implements Tickable {
 
+    @RequiredArgsConstructor
+    public enum Speed {
+        FAST(2L),
+        NORMAL(10L),
+        SLOW(20L);
+
+        @NotNull @Getter final Long period;
+    }
+
     @NotNull @Getter DarplexNametags plugin;
+    @NotNull @Getter @Setter Speed speed;
 
     private int tick = 1;
     private BukkitTask task = null;
-
-    private boolean needsReset() {
-        return (tick % 10) == 0L;
-    }
 
     @Override
     public void start() {
@@ -29,7 +36,7 @@ public class RainbowGradient implements Tickable {
             public void run() {
                 tick += 1;
             }
-        }.runTaskTimer(getPlugin(), 0L, 10L);
+        }.runTaskTimer(getPlugin(), 0L, getSpeed().getPeriod());
         // runs every second!
         // runs every 0.25 seconds!
     }

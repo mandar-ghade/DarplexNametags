@@ -1,11 +1,11 @@
 package com.darplex.darplexNametags.component;
 
 import com.darplex.darplexNametags.DarplexNametags;
+import com.darplex.darplexNametags.counters.RainbowGradient;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.jetbrains.annotations.NotNull;
 
@@ -38,8 +38,12 @@ public class DarplexComponent {
         Component get();
     }
 
+    public DarplexComponent rainbow(@NotNull DarplexNametags plugin, UUID ownerUUID, RainbowGradient.Speed speed) {
+        return new RainbowComponent(plugin, text, ownerUUID, speed);
+    }
+
     public DarplexComponent rainbow(@NotNull DarplexNametags plugin, UUID ownerUUID) {
-        return new RainbowComponent(plugin, text, ownerUUID);
+        return new RainbowComponent(plugin, text, ownerUUID, RainbowGradient.Speed.NORMAL);
     }
 
     public DarplexComponent color(NamedTextColor color) {
