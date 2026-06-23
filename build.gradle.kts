@@ -12,9 +12,6 @@ repositories {
     maven("https://maven.pvphub.me/tofaa")
     maven { url = uri("https://repo.codemc.io/repository/maven-releases/") }
     maven { url = uri("https://repo.codemc.io/repository/maven-snapshots/") }
-//    flatDir {
-//        dirs("libs")
-//    }
 }
 
 dependencies {
@@ -23,9 +20,6 @@ dependencies {
     annotationProcessor("org.projectlombok:lombok:1.18.46")
     implementation("io.github.tofaa2:spigot:3.0.3-SNAPSHOT")
     compileOnly("com.github.retrooper:packetevents-spigot:2.12.1")
-//    compileOnly("io.github.alexdev03:unlimitednametags-api-paper:2.0.0")
-//    compileOnly("com.google.code.gson:gson:2.11.0")
-
 }
 
 java {

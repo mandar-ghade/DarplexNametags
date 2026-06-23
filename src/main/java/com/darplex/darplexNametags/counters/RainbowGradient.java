@@ -8,9 +8,6 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.UUID;
-import java.util.logging.Level;
-
 @RequiredArgsConstructor
 public class RainbowGradient implements Tickable {
 

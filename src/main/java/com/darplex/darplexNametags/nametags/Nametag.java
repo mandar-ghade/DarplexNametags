@@ -1,15 +1,12 @@
 package com.darplex.darplexNametags.nametags;
 
 import java.util.*;
-import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.stream.Stream;
 
 import com.darplex.darplexNametags.DarplexNametags;
-import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.protocol.entity.type.EntityTypes;
 import com.github.retrooper.packetevents.protocol.player.User;
-import com.github.retrooper.packetevents.protocol.player.UserProfile;
 import com.github.retrooper.packetevents.wrapper.PacketWrapper;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerPlayerInfoUpdate;
 import io.github.retrooper.packetevents.util.SpigotConversionUtil;
@@ -20,7 +17,6 @@ import me.tofaa.entitylib.meta.display.TextDisplayMeta;
 import me.tofaa.entitylib.wrapper.WrapperEntity;
 import me.tofaa.entitylib.wrapper.WrapperPerPlayerEntity;
 import org.bukkit.Bukkit;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.Team;
 
@@ -71,10 +67,6 @@ public class Nametag {
         return new WrapperPerPlayerEntity((ignored) -> defaultEntitySupplier(plugin, ownerUUID));
     }
 
-    private Component getDefaultNametag(User user) {
-        return getPlugin().getComponentIntegration().getDefaultNametag(user.getUUID());
-    }
-
     // Gets what "you" are supposed to see!
     private PacketWrapper<WrapperPlayServerPlayerInfoUpdate> getUpdateTabPacket(Player tabbedPlayer, User tabbedUser, UUID viewerUUID) {
         Component text = view.view(viewerUUID);
@@ -104,10 +96,6 @@ public class Nametag {
                 .forEach((e) -> sendTabUpdatePacket(e.getKey(), e.getValue(), tabbedPlayer, tabbedUser));
     }
 
-    private void toggleInTabList(Player tabbedPlayer, User tabbedUser) {
-        toggleInTabListForViewers(Bukkit.getOnlinePlayers().stream(), tabbedUser, tabbedPlayer);
-    }
-
     public boolean canSee(UUID viewer) {
         return getPlugin().getVanishIntegration().canSee(uuid, viewer);
     }
@@ -118,7 +106,7 @@ public class Nametag {
 
     public <T> void logIfAbsent(Optional<T> opt, String msg) {
         if (opt.isEmpty()) {
-            Bukkit.getLogger().log(Level.SEVERE, "View >> " + msg);
+            plugin.getLogger().log(Level.SEVERE, "View >> " + msg);
         }
     }
 

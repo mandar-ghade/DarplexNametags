@@ -2,12 +2,10 @@ package com.darplex.darplexNametags.integrations;
 
 import com.darplex.darplexNametags.DarplexNametags;
 import com.darplex.darplexNametags.component.DarplexComponent;
-import com.darplex.darplexNametags.counters.RainbowGradient;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextColor;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
