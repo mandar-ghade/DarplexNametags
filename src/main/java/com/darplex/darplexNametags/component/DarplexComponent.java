@@ -5,18 +5,21 @@ import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
+import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 public class DarplexComponent {
 //    @NotNull @Getter DarplexNametags plugin;
     // Text contains <tags>!
     @NotNull @Getter String text;
-    @Getter List<DarplexComponent> componentList = List.of();
+    @Getter List<DarplexComponent> componentList = new ArrayList<>();
     @Getter MiniMessage mm = MiniMessage.miniMessage();
     // DarplexComponent.text("test", plugin).append(Cmp.rainbow("hi"))
     // todo: this is a little strange
@@ -40,7 +43,12 @@ public class DarplexComponent {
     }
 
     public DarplexComponent color(NamedTextColor color) {
-        return new ColoredComponent(text, color);
+        String colorName = "<" + color.toString().toLowerCase() + ">";
+        return DarplexComponent.text(colorName + text);
+    }
+
+    public DarplexComponent bold() {
+        return DarplexComponent.text("<bold>" + text);
     }
 
     private void addSpace() {
@@ -57,12 +65,9 @@ public class DarplexComponent {
         return new DarplexComponent(" ");
     }
 
-    // Component resolver may change what the raw text should look like!
     public Component resolve() {
-        Component base = componentResolver.get();
-        for (var comp : componentList) {
-            base = base.append(comp.resolve());
-        }
-        return base;
+        var base = Component.text().append(componentResolver.get());
+        base.append(componentList.stream().map(DarplexComponent::resolve).collect(Collectors.toList()));
+        return base.build(); // returns built Component!
     }
 }
