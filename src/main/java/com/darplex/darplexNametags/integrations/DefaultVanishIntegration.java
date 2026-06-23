@@ -18,12 +18,14 @@ public class DefaultVanishIntegration implements VanishIntegration {
 
     @NotNull @Getter DarplexNametags plugin;
 
+    // UUID 1: Owner (viewer), UUID 2 : target
+    // Owner looks at target
     Map<Map.Entry<UUID, UUID>, Boolean> overrides = new ConcurrentHashMap<>();
     @Getter Set<UUID> vanishOverrides = new HashSet<>();
 
     @Override
-    public boolean canSee(UUID owner, UUID viewer) {
-        return overrides.getOrDefault(Map.entry(owner, viewer), true);
+    public boolean canSee(UUID owner, UUID target) {
+        return overrides.getOrDefault(Map.entry(owner, target), true);
     }
 
     @Override
@@ -34,17 +36,17 @@ public class DefaultVanishIntegration implements VanishIntegration {
     @Override
     public void vanishPlayer(Player player) {
         Bukkit.getOnlinePlayers().stream()
-                .filter((viewer) -> player.getUniqueId() != viewer.getUniqueId()
-                        && !canSee(viewer.getUniqueId(), player.getUniqueId())
-                ).forEach((viewer) -> viewer.hidePlayer(getPlugin(), player));
+                .filter((target) -> player.getUniqueId() != target.getUniqueId()
+                        && !canSee(target.getUniqueId(), player.getUniqueId())
+                ).forEach((target) -> target.hidePlayer(getPlugin(), player));
     }
 
     @Override
     public void unvanishPlayer(Player player) {
         Bukkit.getOnlinePlayers().stream()
-                .filter((viewer) -> player.getUniqueId() != viewer.getUniqueId()
-                        && canSee(viewer.getUniqueId(), player.getUniqueId())
-                ).forEach((viewer) -> viewer.showPlayer(getPlugin(), player));
+                .filter((target) -> player.getUniqueId() != target.getUniqueId()
+                        && canSee(target.getUniqueId(), player.getUniqueId())
+                ).forEach((target) -> target.showPlayer(getPlugin(), player));
     }
 
     @Override

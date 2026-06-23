@@ -9,7 +9,7 @@ public interface VanishIntegration {
     // Whether you can see a nametag (or tab) or not!
     // TODO: in the future, distinguish seeing "Tab" from seeing their "Nametag"
     // TODO: refactor: Arg 1: viewer, Arg 2: audience
-    // Owner == looker, Viewer == target (owner tries to look at viewer)
+    // Arg 1 == owner, Arg 2 == target (looker tries to look at target)
     boolean canSee(UUID owner, UUID target);
     void setCanSee(UUID owner, UUID target, boolean visible);
     void vanishPlayer(Player player);
