@@ -2,6 +2,7 @@ package com.darplex.darplexNametags.nametags;
 
 import java.util.*;
 import java.util.logging.Level;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.darplex.darplexNametags.DarplexNametags;
@@ -134,16 +135,33 @@ public class Nametag {
         ));
     }
 
-    private Map.Entry<Player, User> getFromUUID(UUID userUUID) {
-        Player player = Bukkit.getPlayer(userUUID);
-        User user = player == null ? null : view.resolveUser(userUUID).get();
+    private Map.Entry<Optional<Player>, Optional<User>> getFromUUID(UUID userUUID) {
+        Optional<Player> player = Optional.ofNullable(Bukkit.getPlayer(userUUID));
+        Optional<User> user = view.resolveUser(userUUID);
         return Map.entry(player, user);
+    }
+
+    private boolean isAnyEmpty(Optional<?>... opt) {
+        return Arrays.stream(opt).anyMatch(Optional::isEmpty);
+    }
+
+    @SafeVarargs
+    private boolean isAnyOffline(Optional<Player>... players) {
+        return !Arrays.stream(players)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .allMatch(Player::isOnline);
     }
 
     private void sendTabUpdatePacket(UUID viewerUUID) {
         var tabbed = getFromUUID(uuid);
         var viewer = getFromUUID(viewerUUID);
-        sendTabUpdatePacket(viewer.getKey(), viewer.getValue(), tabbed.getKey(), tabbed.getValue());
+        if (isAnyEmpty(tabbed.getKey(), tabbed.getValue(), viewer.getKey(), viewer.getValue()) ||
+                isAnyOffline(tabbed.getKey(), viewer.getKey())) {
+            // todo: log!
+            return;
+        }
+        sendTabUpdatePacket(viewer.getKey().get(), viewer.getValue().get(), tabbed.getKey().get(), tabbed.getValue().get());
     }
 
     public void updateNametagFor(UUID viewer) {
@@ -163,6 +181,7 @@ public class Nametag {
     }
 
     public void updateText() {
+        // allows other people to see you!
         Bukkit.getOnlinePlayers().stream()
                 .map(Player::getUniqueId)
                 .filter(this::canSeeMe)
@@ -175,7 +194,6 @@ public class Nametag {
         if (player == null || !player.isOnline() || user == null) {
             return;
         }
-//        Bukkit.getServer().getLogger().warning("Tag creation in `Nametag.java` has ran!");
         // THIS makes a view for everyone who can see you! O(n)
         List<Player> viewers = new ArrayList<>();
         for (Player onlinePlayer : Bukkit.getOnlinePlayers()) {
@@ -266,6 +284,7 @@ public class Nametag {
         } else {
             // Can see them but I'm not allowed to now!
             // (Make invisible)
+            plugin.getLogger().info("Nametag >> " + viewer.getName() + " cannot see " + senderPlayer.getName() + "!");
             senderNametag.makeTagInvisibleFor(uuid);
         }
 
@@ -278,13 +297,33 @@ public class Nametag {
     //
     //
     // Changes what "everyone else" sees
+
+    private void updateTagAndMakeTabVisible(UUID viewerUUID) {
+        makeTagVisibleFor(viewerUUID);
+        sendTabUpdatePacket(viewerUUID);
+    }
+
+    // Changes what "everyone else" sees
     public boolean refresh() {
-        Player playerWithNametag = Bukkit.getPlayer(uuid);
-        if (playerWithNametag == null) {
+        var playerAndUser = getFromUUID(uuid);
+        if (playerAndUser.getKey().isEmpty()
+                || !playerAndUser.getKey().get().isOnline()
+                || playerAndUser.getValue().isEmpty()) {
             return false;
         }
-        this.view.shutdown();
-        create();
+        Set<Player> canSeeMePlayers = Bukkit.getOnlinePlayers()
+                .stream()
+                .filter((viewer) -> canSeeMe(viewer.getUniqueId()))
+                .collect(Collectors.toSet());
+        Set<UUID> cannotSeeMe = Bukkit.getOnlinePlayers()
+                .stream()
+                .filter((p) -> !canSeeMePlayers.contains(p))
+                .map(Player::getUniqueId)
+                .collect(Collectors.toSet());
+        canSeeMePlayers.stream()
+                .map(Player::getUniqueId)
+                .forEach(this::updateTagAndMakeTabVisible);
+        cannotSeeMe.forEach(this::makeTagInvisibleFor);
         return true;
     }
 

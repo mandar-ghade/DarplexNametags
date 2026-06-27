@@ -49,11 +49,27 @@ public class NametagManager {
         return true;
     }
 
+    // Makes sure "offline user" doesn't have an entity for anyone else's nametag
+    // todo: playtest
+    private void removeOfflineViewer(UUID uuid) {
+        for (var nt : nametagMap.values() ) {
+            nt.getView().removeSilent(uuid);
+        }
+        // before:
+//        nametagMap.values().stream()
+//                .map(Nametag::getView)
+//                .filter(view -> view.hasViewer(uuid))
+//                .forEach((v) -> v.removeExistingEntity(uuid));
+    }
+
     public boolean delete(UUID uuid) {
         Nametag nametag = nametagMap.remove(uuid);
         if (nametag == null) {
             return false;
         } else {
+            // so you can't see anyone else (important stuff)
+            removeOfflineViewer(uuid);
+            // no one can see you
             nametag.shutdown();
         }
         return true;
@@ -88,7 +104,6 @@ public class NametagManager {
         receiver.refresh();
         boolean anyFailure = Bukkit.getOnlinePlayers()
                 .stream()
-//                .filter(p -> p.getUniqueId() != uuid)
                 .map((sender) -> this.nametagMap.get(sender.getUniqueId()))
                 .map(receiver::refreshSelfView)
                 .anyMatch((success) -> !success);

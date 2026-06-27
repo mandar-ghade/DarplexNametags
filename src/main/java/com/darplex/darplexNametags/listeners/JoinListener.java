@@ -44,7 +44,7 @@ public class JoinListener implements Listener {
     private NametagRefreshTicker getRefreshTicker(UUID uuid) {
         // 2L is usually nice (as often is possible),
         // Allows for Gradient speed adjustment
-        return new NametagRefreshTicker(plugin, () -> refreshText(uuid), 10L, 2L);
+        return new NametagRefreshTicker(plugin, () -> refreshSelfView(uuid), 10L, 2L);
     }
 
     private void appendTagRefresh(UUID uuid) {

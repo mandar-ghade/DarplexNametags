@@ -91,38 +91,6 @@ public class View {
         return entity.getEntities().containsKey(viewer);
     }
 
-//    private void editPassengers(UUID viewer, BiConsumer<WrapperEntity, WrapperEntity> playerEntityConsumer) {
-//        // Consumer: First argument = playerEntity, Second argument = viewerEntity.
-//        Optional<WrapperEntity> viewerEntityOpt = entityOf(viewer);
-//        if (viewerEntityOpt.isEmpty()) {
-//            return;
-//        }
-//        WrapperEntity viewerEntity = viewerEntityOpt.get();
-//        Optional.ofNullable(Bukkit.getPlayer(owner))
-//                .map(Player::getEntityId)
-//                .flatMap((playerEntityId) -> Optional.ofNullable(getPlugin().getEntityLibAPI().getEntity(playerEntityId)))
-//                .ifPresent((playerEntity) -> playerEntityConsumer.accept(playerEntity, viewerEntity));
-//    }
-//
-//    private void removePassenger(UUID viewer) {
-//        editPassengers(viewer, (playerEntity, viewerEntity) -> {
-//            if (playerEntity.hasPassenger(viewerEntity)) {
-//                playerEntity.removePassenger(viewerEntity);
-//            }
-//        });
-//    }
-//
-//    private void addPassenger(UUID viewer) {
-//        // Refreshes passengers (even if it exists)
-//        editPassengers(viewer, (playerEntity, viewerEntity) -> {
-//            if (playerEntity.hasPassenger(viewerEntity)) {
-//                playerEntity.removePassenger(viewerEntity);
-//            }
-//            playerEntity.addPassenger(viewerEntity);
-//        });
-//    }
-
-
     // Gets all virtual entity riders.
     private Set<Integer> getAllEntityRiders() {
         return entity.getEntities().values().stream()
@@ -160,34 +128,6 @@ public class View {
         );
     }
 
-//    private void addVirtualPassenger(WrapperEntity viewerEntity) {
-//        getPlugin().getVirtualPassengerManager().getPassengerMap()
-//            .compute(owner, (ignored, entityList) -> {
-//                if (entityList == null) {
-//                    return Set.of(viewerEntity.getEntityId());
-//                } else {
-//                    entityList.add(viewerEntity.getEntityId());
-//                    return entityList;
-//                }
-//            });
-//    }
-//
-//    private void removeVirtualPassenger(WrapperEntity viewerEntity) {
-//        getPlugin().getVirtualPassengerManager().getPassengerMap()
-//                .computeIfPresent(owner, (ignored, entityList) -> {
-//                    entityList.remove(viewerEntity.getEntityId());
-//                    return entityList;
-//                });
-//    }
-//
-//    public void addPassengerClean(UUID viewer) {
-//        entityOf(viewer).ifPresent(this::addVirtualPassenger);
-//    }
-//
-//    public void removePassengerClean(UUID viewer) {
-//        entityOf(viewer).ifPresent(this::removeVirtualPassenger);
-//    }
-//
     private void logSpawnNametagFailed(String name) {
         // todo: make logging more verbose
         getPlugin().getLogger().log(Level.SEVERE, "View >> Spawn location of NameTag viewer: " +
@@ -244,11 +184,17 @@ public class View {
                 .orElse(false);
     }
 
-    private void removeExistingEntity(UUID viewer) {
+    // todo: figure out if I should keep this public
+    public void removeExistingEntity(UUID viewer) {
         // Perhaps offline, but entity is still present! (no sending packets)
         entityOf(viewer)
                 .ifPresent((e) -> e.removeViewerSilently(viewer));
         entity.getEntities().remove(viewer);
+    }
+
+    // Removes a "viewer" silently
+    public void removeSilent(UUID viewer) {
+        removeExistingEntity(viewer);
     }
 
     // handles invisible case.
@@ -270,10 +216,11 @@ public class View {
 
     private void editText(@NotNull User viewerUser, NewView newView) {
         modifyDisplay(viewerUser, (displayMeta) -> {
-            displayMeta.setText(newView.getText());
+            displayMeta.setText(newView.getText().appendNewline());
         });
     }
 
+    // todo: figure out if I should keep this or not
     private void refreshEntityAndSpawn(@NotNull User viewerUser, NewView newView) {
         // this is a temporary kind of refresh (just destroying, no teleporting):
         // This does not change the entityId (nice)!
@@ -296,6 +243,7 @@ public class View {
             return;
         }
         if (!hasViewer(viewer)) {
+            Bukkit.getLogger().info("View >> Creating nametag for non existant viewer!");
             create(viewer);
             // double check that update has location updated!
             update(viewer, newView); // recursive call!
@@ -305,8 +253,7 @@ public class View {
         Optional<User> viewerUserOpt = resolveUser(viewer);
         // Case 1: offline
         if (viewerUserOpt.isEmpty()) {
-            // todo: ensure the code works without the removePassenger!
-//            removePassengerClean(viewer);
+            Bukkit.getLogger().info("View >> Removing old viewer user!");
             removeExistingEntity(viewer);
             return;
         }
@@ -318,12 +265,10 @@ public class View {
             makeEntityInvisible(viewerUser);
             return;
         }
-        // todo: perhaps just remake
+        // no need to respawn entity! (keeps it from teleporting)
         editText(viewerUser, newView);
-        // todo: notice addPassenger is RIGHT before viewer is added!
-        refreshEntityAndSpawn(viewerUser, newView);
-//        addPassengerClean(viewer);
         // resend mount packet!
+        viewerUser.sendPacketSilently(getPassengersPacket());
     }
 
     public void remove(UUID viewer) {
@@ -350,6 +295,7 @@ public class View {
         }
     }
 
+    // Removes people who "see" you
     public void shutdown() {
         for (UUID uuid : getEntity().getEntities().keySet()) {
             remove(uuid);
